@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import tempfile
 from io import BytesIO
 from typing import Any
 
@@ -436,6 +437,16 @@ class TestPyEncoder(CodecsTest):
 
         with pytest.raises(NotImplementedError):
             encoder.encode_to_file(0, 0)
+
+    def test_encode_to_file_writes_encoded_prefix(self) -> None:
+        class Encoder(ImageFile.PyEncoder):
+            def encode(self, bufsize: int) -> tuple[int, int, bytes]:
+                return 3, 1, b"ABC"
+
+        with tempfile.TemporaryFile() as fp:
+            Encoder("RGB").encode_to_file(fp.fileno(), 65536)
+            fp.seek(0)
+            assert fp.read() == b"ABC"
 
     def test_zero_height(self) -> None:
         with pytest.raises(UnidentifiedImageError):

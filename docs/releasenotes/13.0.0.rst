@@ -228,3 +228,11 @@ position or contents.
 
 :py:meth:`~PIL.Image.Image.tobytes` also now explicitly cleans up its encoder on
 both success and failure, rather than relying on object destruction.
+
+Fixed PyEncoder.encode_to_file() writing the wrong bytes
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+:py:meth:`~PIL.ImageFile.PyEncoder.encode_to_file` wrote ``buf[status:]``,
+discarding the encoded bytes and writing whatever followed them. It now writes
+the first ``status`` bytes, matching the C encoder and
+:py:meth:`~PIL.ImageFile.PyEncoder.encode_to_pyfd`.
